@@ -4,7 +4,7 @@ from datetime import datetime
 class lazyproperty:
     def __init__(self, func):
         self.func = func
-    
+
     def __get__(self, instance, cls):
         if instance is None:
             return self
