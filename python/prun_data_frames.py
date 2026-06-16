@@ -46,4 +46,4 @@ class PrunBids(PrunFrame):
             .with_columns(timestamp = datetime.now())
 
 if __name__ == "__main__":
-    print("foo")
+    pass
