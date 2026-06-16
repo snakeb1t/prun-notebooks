@@ -1,3 +1,4 @@
 terraform/terraform.tfstate
 terraform/.terraform*
 python/.venv
+python/__pycache__
