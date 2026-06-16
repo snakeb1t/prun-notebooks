@@ -1,0 +1,1 @@
+0 * * * * python3 ~/src/prun-notebooks/python/book.py
