@@ -32,7 +32,11 @@ class EvaluatedPrice:
         returns a polars df with the schema ["Ticker", "CX", "BuyPrice", "SellPrice"].
         the buy and sell price can be overridden by the list of overrides passed into the class
         """
-        override_df = pl.DataFrame(self.override_tuples, schema=["Ticker","CX","OverridePrice","OverrideType"])
+        override_df = pl.DataFrame(self.override_tuples, schema={
+            "Ticker": pl.String,
+            "CX": pl.String,
+            "OverridePrice": pl.Float16,
+            "OverrideType": pl.String})
         return (self.price_source.source_df.select("Ticker",cs.starts_with(self.cx.name))
                 .drop(cs.ends_with("Amt"),cs.ends_with("Avail"),cs.ends_with("Price"))
                 .with_columns(pl.lit(["BUY","SELL"]).alias("OverrideType"))
@@ -65,4 +69,6 @@ class EvaluatedPrice:
                 .sort("Ticker"))
 
 if __name__ == "__main__":
-    print(EvaluatedPrice(prun.PrunPrices(), cx=prun.CX.CI1, overrides=[PriceOverride("AR", prun.CX.CI1, "20", PriceType.BUY),PriceOverride("AR", prun.CX.CI1, "100", PriceType.SELL)]).df)
+    prices = prun.PrunPrices()
+    print(EvaluatedPrice(prices, cx=prun.CX.CI1, overrides=[PriceOverride("AR", prun.CX.CI1, "20", PriceType.BUY),PriceOverride("AR", prun.CX.CI1, "100", PriceType.SELL)]).df)
+    print(EvaluatedPrice(prices, cx=prun.CX.CI1).df)
