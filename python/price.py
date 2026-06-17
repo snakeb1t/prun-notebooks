@@ -21,7 +21,7 @@ class PriceOverride:
     def get(self):
         return (self.ticker, self.cx, self.price, self.price_type.name)
 
-class EvaluatedPrice:
+class EvaluatedPrices:
     def __init__(self, price_source: prun.PrunPrices, cx: prun.CX, overrides: list[PriceOverride] = []):
         self.price_source = price_source
         self.cx = cx
@@ -68,5 +68,5 @@ class EvaluatedPrice:
 
 if __name__ == "__main__":
     prices = prun.PrunPrices()
-    print(EvaluatedPrice(prices, cx=prun.CX.CI1, overrides=[PriceOverride("AR", prun.CX.CI1, "20", PriceType.BUY),PriceOverride("AR", prun.CX.CI1, "100", PriceType.SELL)]).df)
-    print(EvaluatedPrice(prices, cx=prun.CX.CI1).df)
+    print(EvaluatedPrices(prices, cx=prun.CX.CI1, overrides=[PriceOverride("AR", prun.CX.CI1, "20", PriceType.BUY),PriceOverride("AR", prun.CX.CI1, "100", PriceType.SELL)]).df)
+    print(EvaluatedPrices(prices, cx=prun.CX.CI1).df)
