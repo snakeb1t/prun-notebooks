@@ -74,7 +74,7 @@ class PrunOrders(PrunFrame):
             .with_columns(timestamp = datetime.now())
 
 class PrunBids(PrunFrame):
-    source = "httpl://rest.fnar.net/csv/bids"
+    source = "https://rest.fnar.net/csv/bids"
     @lazyproperty
     def source_df(self):
         df = super().source_df
