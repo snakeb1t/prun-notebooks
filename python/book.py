@@ -1,5 +1,5 @@
 import prun_data_frames as prundf
-import polars as ps
+import polars as pl
 import sqlite3 as sql
 import os
 from pathlib import Path

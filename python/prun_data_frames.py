@@ -1,4 +1,4 @@
-import polars as ps
+import polars as pl
 from datetime import datetime
 from enum import Enum, auto
 
@@ -42,7 +42,7 @@ class PrunFrame:
     schema_len = 10000
     @lazyproperty
     def source_df(self):
-        return ps.read_csv(self.source, infer_schema_length=self.schema_len)
+        return pl.read_csv(self.source, infer_schema_length=self.schema_len)
 
 class PrunBuildings(PrunFrame):
     source = "https://rest.fnar.net/csv/buildings"
@@ -51,13 +51,13 @@ class PrunBuildings(PrunFrame):
     workforces_source = "https://rest.fnar.net/csv/buildingworkforces"
     @lazyproperty
     def costs_df(self):
-        return ps.read_csv(self.costs_source, infer_schema_length=self.schema_len)
+        return pl.read_csv(self.costs_source, infer_schema_length=self.schema_len)
     @lazyproperty
     def recipes_df(self):
-        return ps.read_csv(self.recipes_source, infer_schema_length=self.schema_len)
+        return pl.read_csv(self.recipes_source, infer_schema_length=self.schema_len)
     @lazyproperty
     def workforces_df(self):
-        return ps.read_csv(self.workforces_source, infer_schema_length=self.schema_len)
+        return pl.read_csv(self.workforces_source, infer_schema_length=self.schema_len)
 
 class PrunPrices(PrunFrame):
     source = "https://rest.fnar.net/csv/prices"
@@ -70,15 +70,15 @@ class PrunOrders(PrunFrame):
     @lazyproperty
     def source_df(self):
         df = super().source_df
-        return df.with_columns(ps.concat_str([ps.col("MaterialTicker"),ps.col("ExchangeCode")], separator=".").alias("CXTicker")) \
+        return df.with_columns(pl.concat_str([pl.col("MaterialTicker"),pl.col("ExchangeCode")], separator=".").alias("CXTicker")) \
             .with_columns(timestamp = datetime.now())
 
 class PrunBids(PrunFrame):
-    source = "https://rest.fnar.net/csv/bids"
+    source = "httpl://rest.fnar.net/csv/bids"
     @lazyproperty
     def source_df(self):
         df = super().source_df
-        return df.with_columns(ps.concat_str([ps.col("MaterialTicker"),ps.col("ExchangeCode")], separator=".").alias("CXTicker")) \
+        return df.with_columns(pl.concat_str([pl.col("MaterialTicker"),pl.col("ExchangeCode")], separator=".").alias("CXTicker")) \
             .with_columns(timestamp = datetime.now())
 
 if __name__ == "__main__":
