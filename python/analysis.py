@@ -43,6 +43,7 @@ class BuildingAnalysis:
               .with_columns((pl.col("SellPrice")*pl.col("OutputQuantity")).alias("RevenuePerRun"))
               .group_by("Building", "Duration", "InputCostPerRun", "Recipe")
               .agg(pl.col("RevenuePerRun").sum())
+              # divide seconds in day by duration to get number of runs per day
               .with_columns((pl.col("RevenuePerRun")*((60*60*24)/pl.col("Duration"))).alias("RevenuePerDay"))
               .with_columns((pl.col("InputCostPerRun")*((60*60*24)/pl.col("Duration"))).alias("InputCostPerDay")))
               #.filter(pl.col("Recipe").str.contains("SF").and_(pl.col("Building") == "REF")))
