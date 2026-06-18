@@ -3,15 +3,20 @@ import polars as pl
 import polars.selectors as cs
 from enum import Enum, auto
 
-class PriceType(Enum):
+class OverrideType(Enum):
     BUY = auto()
     SELL = auto()
+
+class PriceType(Enum):
+    BID = auto()
+    ASK = auto()
+    AVERAGE = auto()
 
 class PriceOverride:
     """
     specifies price overrides for the given ticker
     """
-    def __init__(self, ticker: str, cx: prun.CX, price: float, price_type: PriceType):
+    def __init__(self, ticker: str, cx: prun.CX, price: float, override_type: OverrideType):
         self.ticker = ticker
         self.cx = cx.name
         self.price = price
@@ -29,8 +34,9 @@ class EvaluatedPrices:
     @prun.lazyproperty
     def df(self):
         """
-        returns a polars df with the schema ["Ticker", "CX", "BuyPrice", "SellPrice"].
-        the buy and sell price can be overridden by the list of overrides passed into the class
+        returns a polars df with the schema ["Ticker", "CX", "AskPrice", "BidPrice", "AveragePrice"].
+        the buy and sell price can be overridden by the list of overrides passed into the class.
+        the ask price is overridden on BUY overrides, the bid price is overridden on SELL overrides.
         """
         override_df = pl.DataFrame(self.override_tuples, schema={
             "Ticker": pl.String,
@@ -58,7 +64,8 @@ class EvaluatedPrices:
                                        .then(pl.col(f"{self.cx.name}-BidPrice"))
                                        .otherwise(None))
                             .alias("FinalBidPrice"))
-                .group_by("Ticker","CX")
+                .with_columns(pl.col(f"{self.cx.name}-Average").alias("AveragePrice"))
+                .group_by("Ticker","CX", "AveragePrice")
                 .agg(pl.col("FinalAskPrice").drop_nulls().unique().alias("AskPrice"),
                      pl.col("FinalBidPrice").drop_nulls().unique().alias("BidPrice"))
                 .explode("AskPrice")

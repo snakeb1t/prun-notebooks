@@ -25,6 +25,7 @@ CXtoCurrency = {
     CX.IC1: Currency.ICA
 }
 
+# decorator that caches the return value of a method so it's not recalculated each time it's called
 class lazyproperty:
     def __init__(self, func):
         self.func = func
