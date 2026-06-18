@@ -48,7 +48,7 @@ class EvaluatedPrices:
                 .with_columns(pl.lit(["BUY","SELL"]).alias("OverrideType"))
                 .explode("OverrideType")
                 .join(override_df, on=["Ticker","OverrideType"],how="full",coalesce=True)
-                # make a column called "FinalBuyPrice" that has the override buy price if present, otherwise use average price
+                # make a column called "FinalAskPrice" that has the override buy price if present, otherwise use average price
                 .with_columns(pl.when(pl.col("OverridePrice").is_not_null()
                                    .and_(pl.col("OverrideType").eq("BUY")))
                            .then(pl.col("OverridePrice"))
@@ -56,7 +56,7 @@ class EvaluatedPrices:
                                       .then(pl.col(f"{self.cx.name}-AskPrice"))
                                       .otherwise(None))
                            .alias("FinalAskPrice"))
-                # make a column called "FinalSellPrice" that has the override sell price if present, otherwise use average price
+                # make a column called "FinalBidPrice" that has the override sell price if present, otherwise use average price
                 .with_columns(pl.when(pl.col("OverridePrice").is_not_null()
                                       .and_(pl.col("OverrideType").eq("SELL")))
                             .then(pl.col("OverridePrice"))
