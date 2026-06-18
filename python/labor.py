@@ -54,10 +54,18 @@ class EvaluatedLabor:
         "RatePer100": pl.Float16
     })
     def __init__(self, prices: EvaluatedPrices):
-        labor_df = pl.concat([self.pioneer_df, self.settler_df, self.technician_df, self.engineer_df,self.scientist_df], how="vertical")
-        print(labor_df)
+        self.labor_df = pl.concat([self.pioneer_df, self.settler_df, self.technician_df, self.engineer_df,self.scientist_df], how="vertical")
+        self.prices_df = prices.df
+    @prun.lazyproperty
+    def df(self):
+        return (self.labor_df.join(self.prices_df, left_on="Provision", right_on="Ticker")
+                .drop("CX","BidPrice")
+                .with_columns((pl.col("RatePer100")*pl.col("AskPrice")).alias("TotalCost"))
+                .group_by(pl.col("EmployeeType"))
+                .agg(pl.col("TotalCost").sum().alias("TotalCostPerDayPer100")))
 
 if __name__ == "__main__":
     prices_source = prun.PrunPrices()
     evaluated_prices = EvaluatedPrices(prices_source, cx=prun.CX.CI1)
     labor = EvaluatedLabor(evaluated_prices)
+    print(labor.df)
