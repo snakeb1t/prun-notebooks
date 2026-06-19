@@ -1,0 +1,8 @@
+{
+  "LiteBuildConfig": {
+    "output_dir": "dist",
+    "piplite_urls": [
+	"https://pythonhosted.org"
+    ]
+  }
+}
