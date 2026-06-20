@@ -5,3 +5,7 @@ channels:
 dependencies:
   - xeus-python
   - ipycanvas
+  - polars
+  - sqlalchemy
+  - pandas
+  - pyarrow
