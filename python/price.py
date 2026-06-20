@@ -20,7 +20,7 @@ class PriceOverride:
         self.ticker = ticker
         self.cx = cx.name
         self.price = price
-        self.price_type = price_type
+        self.price_type = override_type
 
     @prun.lazyproperty
     def get(self):
