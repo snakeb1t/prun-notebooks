@@ -5,7 +5,7 @@ channels:
 dependencies:
   - xeus-python
   - ipycanvas
-  - polars == 1.33.1
+  - polars <= 1.33.1
   - sqlalchemy
   - pandas
   - pyarrow
