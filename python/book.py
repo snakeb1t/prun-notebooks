@@ -3,14 +3,10 @@ import polars as pl
 import sqlite3 as sql
 import os
 from pathlib import Path
+from config import Config
 
-script_dir = Path(__file__).resolve().parent
-os.chdir(script_dir)
-
-relative = Path("../../prundb/prundb.db")
-dbfile = relative.resolve()
-
-connection_uri = f"sqlite:///{dbfile}"
+config = Config(__file__)
+connection_uri = config.get_connection_uri
 
 orders = prundf.PrunOrders()
 bids = prundf.PrunBids()
@@ -27,7 +23,7 @@ bids.source_df.write_database(
     if_table_exists="append"  # Options: 'fail', 'replace', 'append'
 )
 
-connection = sql.connect(dbfile)
+connection = sql.connect(config.get_dbpath)
 
 cursor = connection.cursor()
 cursor.execute("DELETE FROM orders WHERE timestamp < datetime('now', '-7 days');")
