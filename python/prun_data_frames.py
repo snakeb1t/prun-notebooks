@@ -1,6 +1,7 @@
 import polars as pl
 from datetime import datetime
 from enum import Enum, auto
+from config import Config
 
 class CX(Enum):
     CI1 = auto()
@@ -104,7 +105,15 @@ class PrunCXPCTicker(PrunFrame):
                 .drop("Interval","TimeEpochMs")
                 .with_columns(pl.lit(f"{self.ticker}").alias("Ticker"))
                 .with_columns(pl.lit(f"{self.cx.name}").alias("CX")))
+
+class PrunCXPCAll():
+    def __init__(self, config: Config):
+        self.config = config 
+    @lazyproperty
+    def source_df(self):
+        uri = self.config.get_connection_uri()
+        return pl.read_database_uri("select * from cxpc", uri)
     
 if __name__ == "__main__":
-    df = PrunCXPCTicker("AR", CX.CI1).source_df
-    print(df)
+    config = Config(__file__)
+    print(PrunCXPCAll(config).source_df)
