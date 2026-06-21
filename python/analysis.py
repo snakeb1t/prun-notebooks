@@ -28,7 +28,7 @@ class BuildingAnalysis:
                                     .agg(pl.col("TotalLaborCostPerDay").sum()))
 
     @prundf.lazyproperty
-    def unit_efficiency_df(self):
+    def unit_efficiency_df(self) -> pl.DataFrame:
         return (self.buildings.recipes_df
             .with_columns(pl.col("Key").str.split(by=":").list.last().alias("Recipe"))
             .drop("Key")
@@ -66,7 +66,7 @@ class BuildingAnalysis:
             # use price based on how we're selling
             .with_columns((pl.col(f"{self.sell}Price")*pl.col("OutputQuantity")).alias("RevenuePerRun"))
 
-            .group_by("Building", "Duration", "InputCostPerRun", "Recipe", "RunsPerDay", "UnitsPerDay")
+            .group_by("Building", "Duration", "InputCostPerRun", "Recipe", "RunsPerDay", "UnitsPerDay", "OutputMaterial")
             .agg(pl.col("RevenuePerRun").sum(),pl.col("OutputQuantity").sum())
 
             .with_columns((pl.col("RevenuePerRun")*pl.col("RunsPerDay")).alias("RevenuePerDay"))
@@ -78,7 +78,7 @@ class BuildingAnalysis:
             .with_columns((pl.col("RevenuePerDay")-pl.col("TotalCostPerDay")).alias("ProfitPerDay"))
             .drop(cs.ends_with("Price")))
 
-    def df(self, efficiency=1.0):
+    def df(self, efficiency=1.0) -> pl.DataFrame:
         unit_df = self.unit_efficiency_df
         if efficiency == 1.0:
             return unit_df

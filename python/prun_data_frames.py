@@ -1,6 +1,7 @@
 import polars as pl
 from datetime import datetime
 from enum import Enum, auto
+from config import Config
 
 class CX(Enum):
     CI1 = auto()
@@ -82,5 +83,37 @@ class PrunBids(PrunFrame):
         return df.with_columns(pl.concat_str([pl.col("MaterialTicker"),pl.col("ExchangeCode")], separator=".").alias("CXTicker")) \
             .with_columns(timestamp = datetime.now())
 
+class PrunCXPCTicker(PrunFrame):
+    def __init__(self, ticker: str, cx: CX):
+        self.ticker = ticker
+        self.cx = cx
+        self.source = f"https://rest.fnar.net/csv/cxpc/{ticker}.{cx.name}"
+        self.schema = {
+            "Interval": pl.String,
+            "TimeEpochMs": pl.Int64,
+            "Open": pl.Float64,
+            "Close": pl.Float64,
+            "Volume": pl.Float64,
+            "Traded": pl.Int64
+        }
+    @lazyproperty
+    def source_df(self):
+        df = super().source_df
+        df = df.cast(self.schema)
+        return (df.with_columns(pl.from_epoch(pl.col("TimeEpochMs").cast(pl.Int64),time_unit="ms").alias("ts"))
+                .filter(pl.col("Interval") == "DAY_ONE")
+                .drop("Interval","TimeEpochMs")
+                .with_columns(pl.lit(f"{self.ticker}").alias("Ticker"))
+                .with_columns(pl.lit(f"{self.cx.name}").alias("CX")))
+
+class PrunCXPCAll():
+    def __init__(self, config: Config):
+        self.config = config 
+    @lazyproperty
+    def source_df(self):
+        uri = self.config.get_connection_uri()
+        return pl.read_database_uri("select * from cxpc", uri)
+    
 if __name__ == "__main__":
-    pass
+    config = Config(__file__)
+    print(PrunCXPCAll(config).source_df)
