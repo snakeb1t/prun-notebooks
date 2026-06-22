@@ -113,7 +113,21 @@ class PrunCXPCAll():
     def source_df(self):
         uri = self.config.get_connection_uri()
         return pl.read_database_uri("select * from cxpc", uri)
+    @lazyproperty
+    def avg_volume_df(self):
+        df = (self.source_df.sort("ts",descending=False)
+              .with_columns(pl.col("Volume").cast(pl.Int64).alias("Volume")))
+        return df.with_columns(pl.col("Volume")
+                               .rolling_mean_by(pl.col("ts"),window_size="7d")
+                               .over("Ticker")
+                               .alias("7DayAvgVolume"))
     
 if __name__ == "__main__":
+    pl.Config.set_tbl_cols(-1)
+    pl.Config.set_tbl_width_chars(-1)
+    pl.Config.set_thousands_separator(",")
+    pl.Config.set_tbl_rows(20)
     config = Config(__file__)
-    print(PrunCXPCAll(config).source_df)
+    cxpc_all = PrunCXPCAll(config)
+    print(cxpc_all.source_df)
+    print(cxpc_all.avg_volume_df.filter(pl.col("Ticker") == "SF").sort("ts", descending=True).head(14))
