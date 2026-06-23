@@ -18,3 +18,7 @@ class Config:
         dbfile = relative.resolve()
 
         return f"sqlite:///{dbfile}"
+
+if __name__ == "__main__":
+    cfg = Config(__file__)
+    print(cfg.get_connection_uri())
