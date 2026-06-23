@@ -6,7 +6,7 @@ from pathlib import Path
 from config import Config
 
 config = Config(__file__)
-connection_uri = config.get_connection_uri
+connection_uri = config.get_connection_uri()
 
 orders = prundf.PrunOrders()
 bids = prundf.PrunBids()
