@@ -12,7 +12,6 @@ materials_df = PrunMaterials().source_df
 # really don't want to hammer on the api for all cxes
 cx = CX.CI1
 
-
 # TODO: handle http errors
 dfs = [PrunCXPCTicker(ticker,cx).source_df for ticker in materials_df["Ticker"].to_list()]
 

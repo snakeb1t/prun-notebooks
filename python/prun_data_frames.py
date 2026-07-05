@@ -74,7 +74,8 @@ class PrunOrders(PrunFrame):
         df = super().source_df
         return (df.with_columns(pl.concat_str([pl.col("MaterialTicker"),pl.col("ExchangeCode")], separator=".").alias("CXTicker"))
             .with_columns(pl.col("ItemCost").rank(descending=True,method="ordinal").over("CXTicker").alias("rank"))
-            .with_columns(timestamp = datetime.now()))
+            .with_columns(timestamp = datetime.now())
+            .with_columns(pl.col("timestamp").dt.truncate("1h").alias("timestamp")))
 
 class PrunBids(PrunFrame):
     source = "https://rest.fnar.net/csv/bids"
@@ -83,7 +84,8 @@ class PrunBids(PrunFrame):
         df = super().source_df
         return (df.with_columns(pl.concat_str([pl.col("MaterialTicker"),pl.col("ExchangeCode")], separator=".").alias("CXTicker"))
             .with_columns(pl.col("ItemCost").rank(descending=True,method="ordinal").over("CXTicker").alias("rank"))
-            .with_columns(timestamp = datetime.now()))
+            .with_columns(timestamp = datetime.now())
+            .with_columns(pl.col("timestamp").dt.truncate("1h").alias("timestamp")))
 
 class PrunCXPCTicker(PrunFrame):
     def __init__(self, ticker: str, cx: CX):
@@ -131,5 +133,7 @@ if __name__ == "__main__":
     pl.Config.set_tbl_rows(20)
     config = Config(__file__)
     cxpc_all = PrunCXPCAll(config)
+    bids = PrunBids()
     print(cxpc_all.source_df)
     print(cxpc_all.avg_volume_df.filter(pl.col("Ticker") == "SF").sort("ts", descending=True).head(14))
+    print(bids.source_df)
