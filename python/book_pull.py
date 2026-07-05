@@ -23,11 +23,14 @@ bids.source_df.write_database(
     if_table_exists="append"  # Options: 'fail', 'replace', 'append'
 )
 
-connection = sql.connect(config.get_dbpath)
+connection = sql.connect(config.get_dbpath())
 
 cursor = connection.cursor()
-cursor.execute("DELETE FROM orders WHERE timestamp < datetime('now', '-7 days');")
-cursor.execute("DELETE FROM bids WHERE timestamp < datetime('now', '-7 days');")
+cursor.execute("DELETE FROM orders WHERE timestamp < datetime('now', '-7 days')")
+connection.commit()
+cursor.execute("DELETE FROM bids WHERE timestamp < datetime('now', '-7 days')")
+connection.commit()
+cursor.execute("VACUUM")
 connection.commit()
 
 connection.close()
