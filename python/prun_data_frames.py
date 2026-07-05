@@ -72,16 +72,18 @@ class PrunOrders(PrunFrame):
     @lazyproperty
     def source_df(self):
         df = super().source_df
-        return df.with_columns(pl.concat_str([pl.col("MaterialTicker"),pl.col("ExchangeCode")], separator=".").alias("CXTicker")) \
-            .with_columns(timestamp = datetime.now())
+        return (df.with_columns(pl.concat_str([pl.col("MaterialTicker"),pl.col("ExchangeCode")], separator=".").alias("CXTicker"))
+            .with_columns(pl.col("ItemCost").rank(descending=True,method="ordinal").over("CXTicker").alias("rank"))
+            .with_columns(timestamp = datetime.now()))
 
 class PrunBids(PrunFrame):
     source = "https://rest.fnar.net/csv/bids"
     @lazyproperty
     def source_df(self):
         df = super().source_df
-        return df.with_columns(pl.concat_str([pl.col("MaterialTicker"),pl.col("ExchangeCode")], separator=".").alias("CXTicker")) \
-            .with_columns(timestamp = datetime.now())
+        return (df.with_columns(pl.concat_str([pl.col("MaterialTicker"),pl.col("ExchangeCode")], separator=".").alias("CXTicker"))
+            .with_columns(pl.col("ItemCost").rank(descending=True,method="ordinal").over("CXTicker").alias("rank"))
+            .with_columns(timestamp = datetime.now()))
 
 class PrunCXPCTicker(PrunFrame):
     def __init__(self, ticker: str, cx: CX):
