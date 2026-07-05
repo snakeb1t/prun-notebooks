@@ -1,6 +1,7 @@
 terraform/terraform.tfstate
 terraform/.terraform*
 python/.venv
+python/.vscode
 python/__pycache__
 python/dependencies
 terraform
