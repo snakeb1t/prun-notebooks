@@ -29,6 +29,7 @@ Footer {
 }
 
 #left {
+    color: green;
     border: blank;
     width: 4;
     height: 1fr;
@@ -37,9 +38,18 @@ Footer {
 }
 
 #right {
+    color: green;
     border: blank;
     width: 4;
     height: 1fr;
     align: center middle;
     text-align: center;
+}
+
+#left.end {
+    color: red;
+}
+
+#right.end {
+    color: red;
 }
