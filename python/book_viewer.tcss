@@ -1,5 +1,7 @@
 HorizontalGroup {
-    height: 4;
+    height: 3;
+    align: center middle;
+    width: 1fr;
 }
 
 Header {
@@ -20,4 +22,24 @@ Footer {
 }
 
 #time {
+    border: blank;
+    width: 1fr;
+    align: center middle;
+    text-align: center;
+}
+
+#left {
+    border: blank;
+    width: 4;
+    height: 1fr;
+    align: center middle;
+    text-align: center;
+}
+
+#right {
+    border: blank;
+    width: 4;
+    height: 1fr;
+    align: center middle;
+    text-align: center;
 }
