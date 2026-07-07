@@ -1,0 +1,23 @@
+HorizontalGroup {
+    height: 4;
+}
+
+Header {
+    height: 1;
+    dock: top;
+}
+
+Footer {
+    dock: bottom;
+}
+
+#material {
+    width: 14;
+}
+
+#cx {
+    width: 14;
+}
+
+#time {
+}
