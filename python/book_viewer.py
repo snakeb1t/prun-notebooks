@@ -35,6 +35,7 @@ class PrunSelect(Select):
 
 class BookViewerApp(App):
 
+    TITLE = "Order Book Viewer"
     CSS_PATH = "book_viewer.tcss"
     hour = 0
 
@@ -128,7 +129,6 @@ class BookViewerApp(App):
         cx = self.query_one("#cx").value
 
         table.clear(columns=True)
-        columns = ("Trader", "Trader Code", "Amount", "Price")
 
         data_df = bids if type == "bid" else orders
         data_dict_list = (data_df.history_df(self.hour)
@@ -142,7 +142,10 @@ class BookViewerApp(App):
             f"{row['ItemCount']}",
             f"[{color}]{row['ItemCost']}[/{color}]"
         ) for row in data_dict_list]
-        table.add_columns(*columns)
+        table.add_column("Trader", width=50)
+        table.add_column("Code", width=6)
+        table.add_column("Amount", width=9)
+        table.add_column("Price", width=12)
         table.add_rows(data_tuples)
 
 if __name__ == "__main__":
