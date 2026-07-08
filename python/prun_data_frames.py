@@ -41,10 +41,35 @@ class lazyproperty:
 
 class PrunFrame:
     source = ""
+    table_name = "none"
     schema_len = 10000
+    def __init__(self, config: Config | None = None):
+        self.config = config
     @lazyproperty
     def source_df(self):
         return pl.read_csv(self.source, infer_schema_length=self.schema_len)
+    def history_df(self, hour: int | None = None):
+        if self.config == None:
+            return None
+        query = f"SELECT * FROM {self.table_name}"
+        if hour != None:
+            if hour < 0:
+                return None
+            hour = hour + 1
+            query = query + f" WHERE timestamp > datetime('now', 'localtime', '-{hour} hours') AND timestamp < datetime('now', 'localtime', '-{hour-1} hours')"
+        df = pl.read_database_uri(
+            query = query,
+            uri = self.config.get_connection_uri()
+        )
+        return df
+    def timestamps(self):
+        if self.config == None:
+            return None
+        df = pl.read_database_uri(
+            query = f"SELECT DISTINCT(timestamp) AS ts FROM {self.table_name} ORDER BY ts DESC",
+            uri = self.config.get_connection_uri()
+        )
+        return df["ts"].cast(pl.String).to_list()
 
 class PrunBuildings(PrunFrame):
     source = "https://rest.fnar.net/csv/buildings"
@@ -69,6 +94,7 @@ class PrunMaterials(PrunFrame):
 
 class PrunOrders(PrunFrame):
     source = "https://rest.fnar.net/csv/orders"
+    table_name = "orders"
     @lazyproperty
     def source_df(self):
         df = super().source_df
@@ -79,6 +105,7 @@ class PrunOrders(PrunFrame):
 
 class PrunBids(PrunFrame):
     source = "https://rest.fnar.net/csv/bids"
+    table_name = "bids"
     @lazyproperty
     def source_df(self):
         df = super().source_df
@@ -133,7 +160,13 @@ if __name__ == "__main__":
     pl.Config.set_tbl_rows(20)
     config = Config(__file__)
     cxpc_all = PrunCXPCAll(config)
-    bids = PrunBids()
+    bids = PrunBids(config=config)
     print(cxpc_all.source_df)
     print(cxpc_all.avg_volume_df.filter(pl.col("Ticker") == "SF").sort("ts", descending=True).head(14))
     print(bids.source_df)
+    #print("history")
+    #print(bids.history_df())
+    #print("timestamps")
+    #print(bids.timestamps())
+    #print("history range")
+    #print(bids.history_df(hour=0))

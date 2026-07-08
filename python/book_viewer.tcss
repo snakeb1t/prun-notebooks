@@ -1,0 +1,55 @@
+HorizontalGroup {
+    height: 3;
+    align: center middle;
+    width: 1fr;
+}
+
+Header {
+    height: 1;
+    dock: top;
+}
+
+Footer {
+    dock: bottom;
+}
+
+#material {
+    width: 14;
+}
+
+#cx {
+    width: 14;
+}
+
+#time {
+    border: blank;
+    width: 1fr;
+    align: center middle;
+    text-align: center;
+}
+
+#left {
+    color: green;
+    border: blank;
+    width: 4;
+    height: 1fr;
+    align: center middle;
+    text-align: center;
+}
+
+#right {
+    color: green;
+    border: blank;
+    width: 4;
+    height: 1fr;
+    align: center middle;
+    text-align: center;
+}
+
+#left.end {
+    color: red;
+}
+
+#right.end {
+    color: red;
+}
