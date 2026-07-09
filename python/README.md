@@ -4,6 +4,7 @@ For Linux only. If you're a Windows user, consider installing WSL so you have a 
 
 1. Run `./setup.sh`, follow any instructions
 1. Install crontab (`crontab -e`) based on sample crontab (`crontab.example`). You may need to set your path to the `.venv/bin` directory
+1. Run `source .venv/bin/activate` before running any scripts
 
 ## Scripts
 
