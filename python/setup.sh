@@ -7,7 +7,7 @@ if [[ ! -f "$DBFILE" ]]; then
 	exit 1
 fi
 
-sqlite3 $DBFILE < schema.sql
+sqlite3 $DBFILE < schema.sql || exit 1
 
 # setup venv
 if [[ ! -d ".venv" ]]; then
