@@ -1,1 +1,2 @@
-0 * * * * python3 ~/src/prun-notebooks/python/book.py
+0 * * * * python3 /home/user/src/prun-notebooks/python/book_pull.py
+20 16 * * * python3 /home/user/src/prun-notebooks/python/cxpc_pull.py
