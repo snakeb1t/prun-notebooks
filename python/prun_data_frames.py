@@ -145,7 +145,7 @@ class PrunCXPCAll():
         uri = self.config.get_connection_uri()
         return pl.read_database_uri("select * from cxpc", uri)
     @lazyproperty
-    def avg_volume_df(self):
+    def enhanced_df(self):
         df = (self.source_df.sort("ts",descending=False)
               .with_columns(pl.col("Volume").cast(pl.Int64).alias("Volume")))
         return (df.with_columns(pl.concat_str([pl.col("Ticker"),pl.col("CX")], separator=".").alias("CXTicker"))
@@ -184,7 +184,7 @@ if __name__ == "__main__":
     cxpc_all = PrunCXPCAll(config)
     bids = PrunBids(config=config)
     print(cxpc_all.source_df)
-    print(cxpc_all.avg_volume_df.filter(pl.col("Ticker") == "SF").sort("ts", descending=True).head(21))
+    print(cxpc_all.enhanced_df.filter(pl.col("Ticker") == "SF").sort("ts", descending=True).head(21))
     print(bids.source_df)
     #print("history")
     #print(bids.history_df())
