@@ -98,8 +98,10 @@ class PrunOrders(PrunFrame):
     @lazyproperty
     def source_df(self):
         df = super().source_df
-        return (df.with_columns(pl.concat_str([pl.col("MaterialTicker"),pl.col("ExchangeCode")], separator=".").alias("CXTicker"))
-            .with_columns(pl.col("ItemCost").rank(descending=True,method="ordinal").over("CXTicker").alias("rank"))
+        return (df.with_row_index("id")
+            .with_columns(pl.concat_str([pl.col("MaterialTicker"),pl.col("ExchangeCode")], separator=".").alias("CXTicker"))
+            .with_columns(pl.col("id").rank(descending=True,method="ordinal").over("CXTicker").alias("rank"))
+            .drop("id")
             .with_columns(timestamp = datetime.now())
             .with_columns(pl.col("timestamp").dt.truncate("1h").alias("timestamp")))
 
@@ -109,8 +111,10 @@ class PrunBids(PrunFrame):
     @lazyproperty
     def source_df(self):
         df = super().source_df
-        return (df.with_columns(pl.concat_str([pl.col("MaterialTicker"),pl.col("ExchangeCode")], separator=".").alias("CXTicker"))
-            .with_columns(pl.col("ItemCost").rank(descending=True,method="ordinal").over("CXTicker").alias("rank"))
+        return (df.with_row_index("id")
+            .with_columns(pl.concat_str([pl.col("MaterialTicker"),pl.col("ExchangeCode")], separator=".").alias("CXTicker"))
+            .with_columns(pl.col("id").rank(method="ordinal").over("CXTicker").alias("rank"))
+            .drop("id")
             .with_columns(timestamp = datetime.now())
             .with_columns(pl.col("timestamp").dt.truncate("1h").alias("timestamp")))
 
@@ -183,9 +187,9 @@ if __name__ == "__main__":
     config = Config(__file__)
     cxpc_all = PrunCXPCAll(config)
     bids = PrunBids(config=config)
-    print(cxpc_all.source_df)
-    print(cxpc_all.enhanced_df.filter(pl.col("Ticker") == "SF").sort("ts", descending=True).head(21))
-    print(bids.source_df)
+    #print(cxpc_all.source_df)
+    #print(cxpc_all.enhanced_df.filter(pl.col("Ticker") == "RAT").sort("ts", descending=True).head(21))
+    print(bids.source_df.sort(["CXTicker", "rank"]).filter(pl.col("MaterialTicker").eq("RAT")))
     #print("history")
     #print(bids.history_df())
     #print("timestamps")
