@@ -194,8 +194,16 @@ class PrunLM():
             # return empty dataframe
             return pl.DataFrame()
         # don't care about shipping right now
-        sell_df = pl.from_dicts(resp_json['SellingAds']).with_columns(pl.lit("SELL").alias("type"))
-        buy_df = pl.from_dicts(resp_json['BuyingAds']).with_columns(pl.lit("BUY").alias("type"))
+        sell_df = pl.DataFrame()
+        if resp_json['SellingAds']:
+            sell_df = pl.from_dicts(resp_json['SellingAds']).with_columns(pl.lit("SELL").alias("type"))
+        buy_df = pl.DataFrame()
+        if resp_json['BuyingAds']:
+            buy_df = pl.from_dicts(resp_json['BuyingAds']).with_columns(pl.lit("BUY").alias("type"))
+        if sell_df.is_empty():
+            return buy_df
+        if buy_df.is_empty():
+            return sell_df
         return pl.concat([buy_df, sell_df],how="vertical").select("ContractNaturalId", "type",
                                                                   "CreatorCompanyName", "MaterialTicker",
                                                                   "MaterialAmount", "Price")
@@ -219,3 +227,4 @@ if __name__ == "__main__":
     #print("history range")
     #print(bids.history_df(hour=0))
     print(PrunLM("Coldwell Deep").source_df)
+    print(pl.concat([bids.source_df, pl.DataFrame()],how="vertical"))
