@@ -23,17 +23,26 @@ uri = dbconfig.get_connection_uri()
 planets_df = pl.read_database_uri("select planet from lm_planet_targets", uri)
 planets = planets_df["planet"].to_list()
 
-# get topic from .env file
+# get ntfy topic from .env file
 load_dotenv()
 topic = os.getenv("LM_TOPIC")
 
+# ntfy.sh is a free service where you can make a topic and send and receive messages from it.
+# you want to keep the topic a secret, so give it a readable prefix like prun_lm_ and then add some random characters.
+# this script will send messages to a configured topic (see above about putting the topic in a local .env file)
+# to receive the messages, go to your phone and download the ntfy app. then subscribe to the topic you configured and
+# you'll receive a phone notification when your script sends a message!
 client = NtfyClient(topic=topic)
 message = ""
 
+print("configured planets:")
 print(planets)
 
 for planet in planets:
     ads = pdf.PrunLM(planet=planet).source_df
+    if ads.is_empty():
+        break
+
     table_name = "lm_" + planet.replace(" ", "_").replace("-", "_")
 
     last_ads = None
@@ -45,10 +54,14 @@ for planet in planets:
         # table doesn't exist, so make one if there were ads
         write_ads(ads, uri, table_name)
         break
+
+    if last_ads.is_empty():
+        break
+
     delta = ads.join(last_ads, on="ContractNaturalId", how="anti")
     if not delta.is_empty():
         lines = [f"{row['MaterialTicker']}: {row['type']} {row['MaterialAmount']} @ {row['Price']} from {row['CreatorCompanyName']}" for row in delta.to_dicts()]
-        lines = [f"New ads from {planet}:"] + lines + [""]
+        lines = [f"New ads from {planet}:\n"] + lines + ["\n"]
         message = message + "\n".join(lines)
     write_ads(ads, uri, table_name)
 
