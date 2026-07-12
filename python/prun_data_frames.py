@@ -178,7 +178,12 @@ class PrunCXPCAll():
                     .with_columns(pl.col("Close").rolling_mean_by(pl.col("ts"),window_size="30d")
                                 .over("CXTicker")
                                 .round(2)
-                                .alias("30DayAvgPrice")))
+                                .alias("30DayAvgPrice"))
+                    #.with_columns((pl.sum("Volume").rolling(index_column="ts",period="7d")/pl.sum("Traded").rolling(index_column="ts",period="7d")).alias("7DayVWAP")))
+                    .with_columns((pl.col("7DayAvgVolume")/pl.col("7DayAvgTraded")).alias("7DayVWAP"))
+                    .with_columns((pl.col("30DayAvgVolume")/pl.col("30DayAvgTraded")).alias("30DayVWAP"))
+                    .with_columns(((pl.col("7DayVWAP").pct_change(n=7).over("CXTicker"))*100).alias("7DayPriceChange"))
+                    .with_columns(((pl.col("30DayVWAP").pct_change(n=7).over("CXTicker"))*100).alias("30DayPriceChange")))
 
 class PrunLM():
     def __init__(self, planet: str):
@@ -218,13 +223,6 @@ if __name__ == "__main__":
     cxpc_all = PrunCXPCAll(config)
     bids = PrunBids(config=config)
     #print(cxpc_all.source_df)
-    #print(cxpc_all.enhanced_df.filter(pl.col("Ticker") == "RAT").sort("ts", descending=True).head(21))
+    #print(cxpc_all.enhanced_df.filter(pl.col("Ticker") == "AMM").sort("ts", descending=True).head(21))
     print(bids.source_df.sort(["CXTicker", "rank"]).filter(pl.col("MaterialTicker").eq("RAT")))
-    #print("history")
-    #print(bids.history_df())
-    #print("timestamps")
-    #print(bids.timestamps())
-    #print("history range")
-    #print(bids.history_df(hour=0))
     print(PrunLM("Coldwell Deep").source_df)
-    print(pl.concat([bids.source_df, pl.DataFrame()],how="vertical"))
