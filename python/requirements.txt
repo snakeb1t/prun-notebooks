@@ -4,3 +4,5 @@ polars
 pyarrow
 connectorx
 textual
+python-ntfy
+python-dotenv
