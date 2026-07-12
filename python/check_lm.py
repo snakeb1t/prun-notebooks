@@ -55,9 +55,6 @@ for planet in planets:
         write_ads(ads, uri, table_name)
         break
 
-    if last_ads.is_empty():
-        break
-
     delta = ads.join(last_ads, on="ContractNaturalId", how="anti")
     if not delta.is_empty():
         lines = [f"{row['MaterialTicker']}: {row['type']} {row['MaterialAmount']} @ {row['Price']} from {row['CreatorCompanyName']}" for row in delta.to_dicts()]
