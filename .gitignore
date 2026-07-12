@@ -4,4 +4,5 @@ python/.venv
 python/.vscode
 python/__pycache__
 python/dependencies
+python/.env
 terraform

@@ -10,3 +10,4 @@ For Linux only. If you're a Windows user, consider installing WSL so you have a 
 
 * `book_viewer.py`: A script which is to be run in a terminal. Allows you to see the order book over a period of time. Uses local sqlite database for history, must have crontab setup beforehand
 * `analysis.ipynb`: A jupyter notebook that you can use to look through the dataframes that the libraries provide. VSCode is a way to use the notebook
+* `check_lm.py`: A script you run in a cronjob. Sends messages to a configured ntfy topic, informing you of LM updates. Read script comments for more info

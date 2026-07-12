@@ -2,6 +2,7 @@ import polars as pl
 from datetime import datetime
 from enum import Enum, auto
 from config import Config
+import requests
 
 class CX(Enum):
     CI1 = auto()
@@ -178,6 +179,27 @@ class PrunCXPCAll():
                                 .over("CXTicker")
                                 .round(2)
                                 .alias("30DayAvgPrice")))
+
+class PrunLM():
+    def __init__(self, planet: str):
+        self.planet = planet
+    @lazyproperty
+    def source_df(self):
+        url = f"https://rest.fnar.net/localmarket/planet/{self.planet}"
+        resp_json = None
+        try:
+            resp_json = requests.get(url=url).json()
+        except requests.exceptions.JSONDecodeError:
+            # probably empty response due to no ads
+            # return empty dataframe
+            return pl.DataFrame()
+        # don't care about shipping right now
+        sell_df = pl.from_dicts(resp_json['SellingAds']).with_columns(pl.lit("SELL").alias("type"))
+        buy_df = pl.from_dicts(resp_json['BuyingAds']).with_columns(pl.lit("BUY").alias("type"))
+        return pl.concat([buy_df, sell_df],how="vertical").select("ContractNaturalId", "type",
+                                                                  "CreatorCompanyName", "MaterialTicker",
+                                                                  "MaterialAmount", "Price")
+
     
 if __name__ == "__main__":
     pl.Config.set_tbl_cols(-1)
@@ -196,3 +218,4 @@ if __name__ == "__main__":
     #print(bids.timestamps())
     #print("history range")
     #print(bids.history_df(hour=0))
+    print(PrunLM("Coldwell Deep").source_df)

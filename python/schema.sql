@@ -31,5 +31,6 @@ CREATE TABLE IF NOT EXISTS cxpc (
         "Ticker" TEXT,
         "CX" TEXT
 );
+CREATE TABLE IF NOT EXISTS lm_planet_targets(planet TEXT);
 CREATE INDEX IF NOT EXISTS idx_timestamp_orders on orders(timestamp);
 CREATE INDEX IF NOT EXISTS idx_timestamp_bids on bids(timestamp);
