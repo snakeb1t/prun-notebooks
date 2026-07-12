@@ -52,9 +52,9 @@ for planet in planets:
                 uri = uri)
     except RuntimeError:
         # table doesn't exist, so make one if there were ads
+        client.send(f"got a runtime error for {table_name}, probably creating a table")
         write_ads(ads, uri, table_name)
         break
-
     delta = ads.join(last_ads, on="ContractNaturalId", how="anti")
     if not delta.is_empty():
         lines = [f"{row['MaterialTicker']}: {row['type']} {row['MaterialAmount']} @ {row['Price']} from {row['CreatorCompanyName']}" for row in delta.to_dicts()]
