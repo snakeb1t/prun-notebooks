@@ -209,9 +209,7 @@ class PrunLM():
             return buy_df
         if buy_df.is_empty():
             return sell_df
-        return pl.concat([buy_df, sell_df],how="vertical").select("ContractNaturalId", "type",
-                                                                  "CreatorCompanyName", "MaterialTicker",
-                                                                  "MaterialAmount", "Price")
+        return pl.concat([buy_df, sell_df],how="vertical")
 
     
 if __name__ == "__main__":
