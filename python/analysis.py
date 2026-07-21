@@ -65,8 +65,9 @@ class BuildingAnalysis:
 
             # use price based on how we're selling
             .with_columns((pl.col(f"{self.sell}Price")*pl.col("OutputQuantity")).alias("RevenuePerRun"))
+            .with_columns(pl.col(f"{self.sell}Price").alias("SellPriceAdjusted"))
 
-            .group_by("Building", "Duration", "InputCostPerRun", "Recipe", "RunsPerDay", "UnitsPerDay", "OutputMaterial")
+            .group_by("Building", "Duration", "InputCostPerRun", "Recipe", "RunsPerDay", "UnitsPerDay", "OutputMaterial","SellPriceAdjusted")
             .agg(pl.col("RevenuePerRun").sum(),pl.col("OutputQuantity").sum())
 
             .with_columns((pl.col("RevenuePerRun")*pl.col("RunsPerDay")).alias("RevenuePerDay"))
