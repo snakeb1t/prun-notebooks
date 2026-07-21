@@ -131,17 +131,20 @@ class BookViewerApp(App):
         table.clear(columns=True)
 
         data_df = bids if type == "bid" else orders
-        data_dict_list = (data_df.history_df(self.hour)
-                        .filter((pl.col("MaterialTicker").eq(ticker)).and_(pl.col("ExchangeCode").eq(cx)))
-                        .with_columns(pl.col("ItemCost").round(3).alias("ItemCost"))
-                        .sort(pl.col("rank"))
-                        .to_dicts())
-        data_tuples = [(
-            f"{row['CompanyName']}",
-            f"{row['CompanyCode']}",
-            f"{row['ItemCount']}",
-            f"[{color}]{row['ItemCost']}[/{color}]"
-        ) for row in data_dict_list]
+        history_df = data_df.history_df(self.hour)
+        data_tuples = ()
+        if not history_df.is_empty():
+            data_dict_list = (data_df.history_df(self.hour)
+                            .filter((pl.col("MaterialTicker").eq(ticker)).and_(pl.col("ExchangeCode").eq(cx)))
+                            .with_columns(pl.col("ItemCost").round(3).alias("ItemCost"))
+                            .sort(pl.col("rank"))
+                            .to_dicts())
+            data_tuples = [(
+                f"{row['CompanyName']}",
+                f"{row['CompanyCode']}",
+                f"{row['ItemCount']}",
+                f"[{color}]{row['ItemCost']}[/{color}]"
+            ) for row in data_dict_list]
         table.add_column("Trader", width=50)
         table.add_column("Code", width=6)
         table.add_column("Amount", width=9)
