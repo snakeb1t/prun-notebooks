@@ -1,3 +1,4 @@
+PRAGMA journal_mode=WAL;
 CREATE TABLE IF NOT EXISTS bids (
         "MaterialTicker" TEXT,
         "ExchangeCode" TEXT,
