@@ -225,9 +225,15 @@ if __name__ == "__main__":
     print(orders.source_df.sort(["CXTicker", "rank"]).filter(pl.col("MaterialTicker").eq("RAT")))
     print(PrunLM("Coldwell Deep").source_df)
     print(orders.history_df(hour=0))
+    # the start of a query to find "fire sales"
     print(orders.source_df.sort(["MaterialTicker","ExchangeCode","rank"])
           .filter(pl.col("ExchangeCode")=="CI1")
           .with_columns(pl.col("ItemCost").shift(1).over(["MaterialTicker","ExchangeCode"]).alias("NextHighestCost"))
           .group_by("MaterialTicker","ExchangeCode").last()
           .drop_nulls()
           .filter((pl.col("NextHighestCost")*.9) > (pl.col("ItemCost"))))
+    # a query to find where a company has listed their product at a lower price than mine
+    print(orders.source_df.filter((pl.col("CompanyCode") == "TTL").any().over("CXTicker"))
+                                    .with_columns(pl.col("ItemCost").min().over("CXTicker").alias("LowestCost")))
+                                    #.filter((pl.col("CompanyCode") == "TTL") & (pl.col("ItemCost") > pl.col("LowestCost"))))
+    print(orders.source_df.with_columns(pl.col("CompanyCode").get(pl.col("rank").arg_max()).over("CXTicker").alias("LowestCompany")))
