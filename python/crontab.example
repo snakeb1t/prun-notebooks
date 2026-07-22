@@ -1,3 +1,4 @@
 0 * * * * python3 /home/user/src/prun-notebooks/python/book_pull.py
 20 16 * * * python3 /home/user/src/prun-notebooks/python/cxpc_pull.py
 */5 * * * * python3 /home/user/src/prun-notebooks/python/check_lm.py
+*/15 * * * * python3 /home/user/src/prun-notebooks/python/check_orders.py
